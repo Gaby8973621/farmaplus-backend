@@ -6,7 +6,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FrontController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\CategoriaController;
-//aqui le puse un alias para que no me de error
+use App\Http\Controllers\Api\ProductoApiController;
+use App\Http\Controllers\Api\CarritoApiController;
 
 //rutas con el prefijo de v1
 Route::prefix('v1')->group(function () {
@@ -18,6 +19,10 @@ Route::prefix('v1')->group(function () {
     //prefijo de login y registro va a ser auth
     Route::post('/auth/register',[AuthController::class,'register']);
     Route::post('/auth/login',[AuthController::class,'login']);
+
+    // Rutas públicas
+    Route::get('/productos', [ProductoApiController::class, 'index']);
+    Route::get('/productos/{id}', [ProductoApiController::class, 'show']);
 
     ////////////RUTAS PRIVADAS////////////
     // a estas rutas si le vamos a poner autentificacion
@@ -36,6 +41,12 @@ Route::prefix('v1')->group(function () {
 
 });
 
+// Rutas protegidas con Sanctum (requiere autenticación)
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+    Route::post('/carrito/{id}', [CarritoApiController::class, 'agregar']);
+    Route::get('/carrito', [CarritoApiController::class, 'mostrar']);
+    Route::delete('/carrito/{id}', [CarritoApiController::class, 'eliminar']);
+
 });
