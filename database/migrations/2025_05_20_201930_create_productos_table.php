@@ -1,18 +1,28 @@
 <?php
-namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Producto;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class ProductoApiController extends Controller
+return new class extends Migration
 {
-    public function index()
+    public function up()
     {
-        return Producto::all();
+        Schema::create('productos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->text('descripcion')->nullable();
+            $table->decimal('precio', 8, 2);
+            $table->integer('stock');
+            $table->unsignedBigInteger('categoria_id')->nullable();
+            $table->timestamps();
+
+            $table->foreign('categoria_id')->references('id')->on('categorias')->onDelete('set null');
+        });
     }
 
-    public function show($id)
+    public function down()
     {
-        return Producto::findOrFail($id);
+        Schema::dropIfExists('productos');
     }
-}
+};
