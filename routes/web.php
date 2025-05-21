@@ -2,6 +2,8 @@
 
 //use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
+//use Spatie\Permission\Models\Role;
+
 
 //rol para el admin
 //$role = Role::create(['name' => 'admin']);
