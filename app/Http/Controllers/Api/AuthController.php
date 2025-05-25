@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 
 {
+    //////////////// metodo del regitro ///////////////
     public function register(Request $request){
 
         $response = ["success"=>false];
@@ -66,11 +67,26 @@ class AuthController extends Controller
             $user->hasRole('client'); //para saber que rol tiene el usuario
 
             $response['token'] = $user->createToken("farmacia.app")->plainTextToken;
-            $response['user'] = $user;   //para mandar rl usuario
+            $response['user'] = $user;
             $response['success'] = true;
         };
         return response()->json($response, 200);
 
     }
+
+    /////////////// metodo del logout ////////////////
+
+    public function logout(){
+        $response=["success"=>false];
+        // elimina todos los tokens
+        auth()->user()->tokens()->delete();
+        $response=[
+            "success"=>true,
+            "message"=>"Sesion cerrada"
+        ];
+        return response()->json($response, 200);
+
+    }
+
 
 }
