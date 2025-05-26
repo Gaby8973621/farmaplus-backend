@@ -16,6 +16,10 @@ class DatabaseSeeder extends Seeder
         // Ejecuta primero los roles
         $this->call([
             RolesSeeder::class,
+            UsersSeeder::class,
+            CategoriasSeeder::class,
+            ProductosSeeder::class,
+            VentasSeeder::class,
         ]);
 
         // Crea un usuario con rol 'client'
