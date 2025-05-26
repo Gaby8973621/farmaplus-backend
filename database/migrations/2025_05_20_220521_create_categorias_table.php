@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
             $table->string("nombre")->nullable(false);
+            $table->string('slug')->unique();
             $table->text("descripcion")->nullable();
             //es para el menu, si va al menu
             $table->boolean("menu")->default(0);
