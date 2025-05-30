@@ -13,7 +13,7 @@ class UsersSeeder extends Seeder
         $admin = User::firstOrCreate([
             'email' => 'stefany@gmail.com',
         ], [
-            'name' => 'Admin',
+            'name' => 'stefany',
             'password' => bcrypt('admin123'),
         ]);
         $admin->assignRole('admin');

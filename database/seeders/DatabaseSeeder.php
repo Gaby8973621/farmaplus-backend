@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CategoriasSeeder::class,
             ProductosSeeder::class,
             VentasSeeder::class,
+            InventarioSeeder::class,
         ]);
 
         // Crea un usuario con rol 'client'

@@ -6,87 +6,90 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
-
 {
-    //////////////// metodo del regitro ///////////////
-    public function register(Request $request){
+    ///////////// REGISTRO //////////////////
+    public function register(Request $request)
+    {
+        $response = ["success" => false];
 
-        $response = ["success"=>false];
-
-        //esto es para agregar el usuario y se le asigne el rol
-        //validacion de los datos
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
         ]);
 
-        if($validator->fails()){
-            $response = ["error"=>$validator->errors()];
-            return response()->json($response, 200);
+        if ($validator->fails()) {
+            return response()->json(["error" => $validator->errors()], 422);
         }
 
         $input = $request->all();
-        // contra incriptada de laravel
-        $input["password"] = bcrypt($input['password']);
+        $input['password'] = bcrypt($input['password']);
 
-
-        //para crear el usuario
         $user = User::create($input);
-        //asignarle el rol
         $user->assignRole('client');
 
-        $response["success"] = true;
-        $response["token"] = $user->createToken("farmacia")->plainTextToken;
-
-        return response()->json($response, 200);
+        return response()->json([
+            'success' => true,
+            'token' => $user->createToken("farmacia")->plainTextToken,
+            'user' => $user
+        ], 201);
     }
 
-    //////////////// metodo del login ////////////////
-
-    public function login(Request $request){
-        $response = ["success"=>false];
-
-        //esto es para agregar el usuario y se le asigne el rol
-        //validacion de los datos
+    ///////////// LOGIN //////////////////
+    public function login(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
-        if($validator->fails()){
-            $response = ["error"=>$validator->errors()];
-            return response()->json($response, 200);
+        if ($validator->fails()) {
+            return response()->json(["error" => $validator->errors()], 422);
         }
 
-        ///autentificacion///
-        if(auth()->attempt(['email' => $request->email, 'password' => $request->password])){
-            $user = auth()->user();
-            $user->hasRole('client'); //para saber que rol tiene el usuario
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
 
-            $response['token'] = $user->createToken("farmacia.app")->plainTextToken;
-            $response['user'] = $user;
-            $response['success'] = true;
-        };
-        return response()->json($response, 200);
+            if (!$user->hasRole('client')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No autorizado, el usuario no tiene el rol correcto.'
+                ], 403);
+            }
 
+            return response()->json([
+                'success' => true,
+                'token' => $user->createToken("farmacia.app")->plainTextToken,
+                'user' => $user
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Credenciales incorrectas'
+        ], 401);
     }
 
-    /////////////// metodo del logout ////////////////
+    ///////////// LOGOUT //////////////////
+    public function logout()
+    {
+        $user = Auth::user();
 
-    public function logout(){
-        $response=["success"=>false];
-        // elimina todos los tokens
-        auth()->user()->tokens()->delete();
-        $response=[
-            "success"=>true,
-            "message"=>"Sesion cerrada"
-        ];
-        return response()->json($response, 200);
+        if ($user) {
+            $user->tokens()->delete();
 
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión cerrada correctamente'
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No se pudo cerrar sesión'
+        ], 400);
     }
-
-
 }
