@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\FrontController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\ProductoController;
 use App\Http\Controllers\Api\Admin\VentaController;
+use App\Http\Controllers\Api\Admin\InventarioController;
 use App\Http\Controllers\Api\Admin\CategoriaController;
 use App\Http\Controllers\Api\Client\ProductoController as ProductoClient;
 
@@ -23,12 +24,15 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
 
     // Productos públicos
-    Route::get('/productos', [ProductoApiController::class, 'index']);
-    Route::get('/productos/{id}', [ProductoApiController::class, 'show']);
+    Route::get('/productos', [ProductoController::class, 'index']);
+    Route::get('/productos/{id}', [ProductoController::class, 'show']);
 
     /// ventas ///
     Route::get('/ventas', [VentaController::class, 'index']);
     Route::get('/ventas/{id}', [VentaController::class, 'show']);
+
+    /// inventario ///
+    Route::get('/inventarios', [InventarioController::class, 'index']);
 
     ////////// RUTAS PRIVADAS //////////
 
@@ -48,7 +52,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/admin/producto', ProductoController::class);
 
         /// ventas ///
-        Route::apiResource('/admin/ventas', VentaController::class);
+        Route::apiResource('/admin/venta', VentaController::class);
+
+        /// inventario ///
+        Route::apiResource('/admin/inventario', InventarioController::class);
 
         // usuario autenticado
         Route::get('/user', function (Request $request) {

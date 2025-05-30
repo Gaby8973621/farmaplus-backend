@@ -3,19 +3,27 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Http\Request;
 
 class Authenticate extends Middleware
 {
     /**
-     * Override redirectTo behavior for APIs using Sanctum
+     * No redirigir al login en APIs
      */
     protected function redirectTo($request)
     {
+        // Devuelve null para que no intente redirigir a la ruta 'login'
         if (! $request->expectsJson()) {
-            return response()->json([
-                'message' => 'No autenticado. Inicia sesión.'
-            ], 401);
+            return null;
         }
+    }
+
+    /**
+     * Respuesta JSON personalizada para usuarios no autenticados
+     */
+    protected function unauthenticated($request, array $guards)
+    {
+        abort(response()->json([
+            'message' => 'No autenticado. Por favor inicia sesión primero.'
+        ], 401));
     }
 }
